@@ -1,0 +1,208 @@
+const readlineSync = require("readline-sync");
+
+const monster = {
+  maxHealth: 10,
+  name: "Лютый",
+  moves: [
+    {
+      name: "Удар когтистой лапой",
+      physicalDmg: 3, // физический урон
+      magicDmg: 0, // магический урон
+      physicArmorPercents: 20, // физическая броня
+      magicArmorPercents: 20, // магическая броня
+      cooldown: 0, // ходов на восстановление
+    },
+    {
+      name: "Огненное дыхание",
+      physicalDmg: 0,
+      magicDmg: 4,
+      physicArmorPercents: 0,
+      magicArmorPercents: 0,
+      cooldown: 3,
+    },
+    {
+      name: "Удар хвостом",
+      physicalDmg: 2,
+      magicDmg: 0,
+      physicArmorPercents: 50,
+      magicArmorPercents: 0,
+      cooldown: 2,
+    },
+  ],
+};
+
+const user = {
+  maxHealth: 10,
+  name: "Евстафий",
+  moves: [
+    {
+      name: "Удар боевым кадилом",
+      physicalDmg: 2,
+      magicDmg: 0,
+      physicArmorPercents: 0,
+      magicArmorPercents: 50,
+      cooldown: 0,
+    },
+    {
+      name: "Вертушка левой пяткой",
+      physicalDmg: 4,
+      magicDmg: 0,
+      physicArmorPercents: 0,
+      magicArmorPercents: 0,
+      cooldown: 4,
+    },
+    {
+      name: "Каноничный фаербол",
+      physicalDmg: 0,
+      magicDmg: 5,
+      physicArmorPercents: 0,
+      magicArmorPercents: 0,
+      cooldown: 3,
+    },
+    {
+      name: "Магический блок",
+      physicalDmg: 0,
+      magicDmg: 0,
+      physicArmorPercents: 100,
+      magicArmorPercents: 100,
+      cooldown: 4,
+    },
+  ],
+};
+
+function getRandom(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+let monsterCooldown1 = 0,
+  monsterCooldown2 = 0,
+  userCooldown1 = 0,
+  userCooldown2 = 0,
+  userCooldown3 = 0;
+
+while (monster.maxHealth > 0 && user.maxHealth > 0) {
+  let randomNumber;
+  let numberUser;
+
+  do {
+    randomNumber = getRandom(0, 2);
+    //console.log(randomNumber);
+  } while (
+    (randomNumber === 1 && monsterCooldown1 > 0 && monsterCooldown1 < 3) ||
+    (randomNumber === 2 && monsterCooldown2 > 0 && monsterCooldown2 < 2)
+  );
+
+  if (monsterCooldown1 > 0 && monsterCooldown1 < 3) {
+    monsterCooldown1++;
+  } else if (monsterCooldown1 === 3) {
+    monsterCooldown1 = 0;
+  }
+
+  if (monsterCooldown2 > 0 && monsterCooldown2 < 2) {
+    monsterCooldown2++;
+  } else if (monsterCooldown2 === 2) {
+    monsterCooldown2 = 0;
+  }
+
+  switch (randomNumber) {
+    case 1:
+      if (monsterCooldown1 === 0) {
+        monsterCooldown1++;
+      }
+      break;
+    case 2:
+      if (monsterCooldown2 === 0) {
+        monsterCooldown2++;
+      }
+      break;
+    default:
+      break;
+  }
+
+  console.log("\n\nДействие Лютого: " + monster.moves[randomNumber].name);
+
+  console.log(
+    "\nВыберите действие:\n1. Удар боевым кадилом;\n2. Вертушка левой пяткой;\n3. Каноничный фаербол;\n4. Магический блок."
+  );
+
+  numberUser = readlineSync.question("--> ");
+  numberUser = parseInt(numberUser);
+
+  while (
+    (numberUser === 2 && userCooldown1 > 0 && userCooldown1 < 4) ||
+    (numberUser === 3 && userCooldown2 > 0 && userCooldown2 < 3) ||
+    (numberUser === 4 && userCooldown3 > 0 && userCooldown3 < 4)
+  ) {
+    console.log("\nВы пока еще не можете выбрать это действие.");
+    numberUser = readlineSync.question("--> ");
+    numberUser = parseInt(numberUser);
+  }
+
+  if (userCooldown1 > 0 && userCooldown1 < 4) {
+    userCooldown1++;
+  } else if (userCooldown1 === 4) {
+    userCooldown1 = 0;
+  }
+
+  if (userCooldown2 > 0 && userCooldown2 < 3) {
+    userCooldown2++;
+  } else if (userCooldown2 === 3) {
+    userCooldown2 = 0;
+  }
+
+  if (userCooldown3 > 0 && userCooldown3 < 4) {
+    userCooldown3++;
+  } else if (userCooldown3 === 4) {
+    userCooldown3 = 0;
+  }
+
+  switch (numberUser - 1) {
+    case 1:
+      if (userCooldown1 === 0) {
+        userCooldown1++;
+      }
+      break;
+    case 2:
+      if (userCooldown2 === 0) {
+        userCooldown2++;
+      }
+      break;
+    case 3:
+      if (userCooldown3 === 0) {
+        userCooldown3++;
+      }
+      break;
+    default:
+      break;
+  }
+
+  user.maxHealth =
+    user.maxHealth -
+    (monster.moves[randomNumber].physicalDmg -
+      (user.moves[numberUser - 1].physicArmorPercents / 100) *
+        monster.moves[randomNumber].physicalDmg) -
+    (monster.moves[randomNumber].magicDmg -
+      (user.moves[numberUser - 1].magicArmorPercents / 100) *
+        monster.moves[randomNumber].magicDmg);
+  monster.maxHealth =
+    monster.maxHealth -
+    (user.moves[numberUser - 1].physicalDmg -
+      (monster.moves[randomNumber].physicArmorPercents / 100) *
+        user.moves[numberUser - 1].physicalDmg) -
+    (user.moves[numberUser - 1].magicDmg -
+      (monster.moves[randomNumber].magicArmorPercents / 100) *
+        user.moves[numberUser - 1].magicDmg);
+
+  if (user.maxHealth > 0) {
+    console.log("\nВаше здоровье: " + user.maxHealth.toFixed(1));
+  }
+  if (monster.maxHealth > 0) {
+    console.log("Здоровье Лютого: " + monster.maxHealth.toFixed(1));
+  }
+}
+
+if (monster.maxHealth < user.maxHealth) {
+  console.log("\n\nВы выиграли!");
+} else {
+  console.log("\n\nВы проиграли.");
+}
