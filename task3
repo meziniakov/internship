@@ -1,0 +1,36 @@
+const readLineSync = require("readline-sync");
+
+let compNumber = Math.floor(Math.random() * 100000),
+  iteration = 3;
+
+function num2arr(num) {
+  return Array.from(String(num), Number);
+}
+
+let userNumber;
+const compNumberArr = num2arr(compNumber);
+
+for (let n = 1; n <= iteration; n++) {
+  let numOfPlace = [],
+    numOutOfPlace = [];
+
+  console.log(compNumberArr);
+  userNumber = readLineSync.question("Введите четное  пятизначное число ");
+  if (compNumber === Number(userNumber)) {
+    return console.log("Вы выиграли!!!");
+  }
+
+  compNumberArr.map((num, i) => {
+    const userNumberArr = num2arr(userNumber);
+    if (num === userNumberArr[i]) {
+      numOfPlace.push(num);
+    }
+    if (num !== userNumberArr[i] && userNumberArr.includes(num)) {
+      numOutOfPlace.push(num);
+    }
+  });
+  console.log(`Cовпавших цифр 
+- не на своих местах - ${numOutOfPlace.length} (${numOutOfPlace.join(" и ")}), 
+- цифр на своих местах - ${numOfPlace.length} (${numOfPlace.join(" и ")})
+Осталось попыток ${iteration - n}`);
+}
